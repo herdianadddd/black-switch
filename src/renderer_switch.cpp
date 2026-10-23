@@ -26,7 +26,6 @@ bool Renderer_Init(int w, int h) {
     s_queue = dkQueueCreate(&qMaker);
     if(!s_queue) return false;
 
-    // Cmd buffer mem
     DkMemBlockMaker memMaker;
     dkMemBlockMakerDefaults(&memMaker, s_device, DkMemBlockFlags_CpuUncached | DkMemBlockFlags_GpuCached);
     memMaker.size = 1*1024*1024;
@@ -39,11 +38,9 @@ bool Renderer_Init(int w, int h) {
     s_cmdbuf = dkCmdBufCreate(&cmdMaker);
     if(!s_cmdbuf) return false;
 
-    // Fence
     DkFenceMaker fenceMaker; dkFenceMakerDefaults(&fenceMaker, s_device);
     s_fence = dkFenceCreate(&fenceMaker);
 
-    // === NEW API: Buat framebuffer images manual ===
     DkImageLayout layout;
     DkImageLayoutMaker layoutMaker;
     dkImageLayoutMakerDefaults(&layoutMaker, s_device);
@@ -69,7 +66,6 @@ bool Renderer_Init(int w, int h) {
         s_fbImagePtrs[i] = &s_fbImages[i];
     }
 
-    // Swapchain pakai images yang kita buat
     DkSwapchainMaker scMaker;
     dkSwapchainMakerDefaults(&scMaker, s_device, nwindowGetDefault(), s_fbImagePtrs, 2);
     s_swapchain = dkSwapchainCreate(&scMaker);
@@ -102,7 +98,6 @@ void Renderer_Shutdown() {
     dkQueueWaitIdle(s_queue);
     dkSwapchainDestroy(s_swapchain);
     for(int i=0;i<2;i++) {
-        dkImageDestroy(&s_fbImages[i]);
         dkMemBlockDestroy(s_fbMem[i]);
     }
     dkCmdBufDestroy(s_cmdbuf);
