@@ -10,36 +10,26 @@ static bool s_inited = false;
 
 bool Renderer_Init(int w, int h) {
     if(s_inited) return true;
-
-    DkDeviceMaker devMaker;
-    dkDeviceMakerDefaults(&devMaker);
+    DkDeviceMaker devMaker; dkDeviceMakerDefaults(&devMaker);
     s_device = dkDeviceCreate(&devMaker);
     if(!s_device) return false;
-
-    DkQueueMaker qMaker;
-    dkQueueMakerDefaults(&qMaker, s_device);
+    DkQueueMaker qMaker; dkQueueMakerDefaults(&qMaker, s_device);
     s_queue = dkQueueCreate(&qMaker);
     if(!s_queue) return false;
-
     DkMemBlockMaker memMaker;
     dkMemBlockMakerDefaults(&memMaker, s_device, DkMemBlockFlags_CpuUncached | DkMemBlockFlags_GpuCached);
     memMaker.size = 1*1024*1024;
     s_cmdMem = dkMemBlockCreate(&memMaker);
     if(!s_cmdMem) return false;
-
-    DkCmdBufMaker cmdMaker;
-    dkCmdBufMakerDefaults(&cmdMaker, s_device);
+    DkCmdBufMaker cmdMaker; dkCmdBufMakerDefaults(&cmdMaker, s_device);
     cmdMaker.memBlock = s_cmdMem;
-    cmdMaker.offset = 0;
-    cmdMaker.size = memMaker.size;
+    cmdMaker.offset = 0; cmdMaker.size = memMaker.size;
     s_cmdbuf = dkCmdBufCreate(&cmdMaker);
     if(!s_cmdbuf) return false;
-
     DkSwapchainMaker scMaker;
     dkSwapchainMakerDefaults(&scMaker, s_device, nwindowGetDefault(), w, h, 2);
     s_swapchain = dkSwapchainCreate(&scMaker);
     if(!s_swapchain) return false;
-
     s_inited = true;
     return true;
 }
@@ -51,16 +41,15 @@ void Renderer_BeginFrame() {
 
 void Renderer_EndFrame() {
     if(!s_inited) return;
-    
     int slot = dkSwapchainAcquireImage(s_swapchain);
     if(slot < 0) return;
-
     DkImage const* fb = dkSwapchainGetImage(s_swapchain, slot);
-    DkImageView view;
-    dkImageViewDefaults(&view, fb);
-
+    DkImageView view; dkImageViewDefaults(&view, fb);
     dkCmdBufBindRenderTarget(s_cmdbuf, &view, nullptr);
-    dkCmdBufClearColor(s_cmdbuf, 0, DkImageFormat_RGBA8_Unorm, 0x000000FF);
+    
+    // API BARU: mask + pointer
+    float black[4] = {0.0f, 0.0f, 0.0f, 1.0f};
+    dkCmdBufClearColor(s_cmdbuf, 0, 15, black);
 
     DkCmdList list = dkCmdBufFinishList(s_cmdbuf);
     dkQueueSubmitCommands(s_queue, list);
