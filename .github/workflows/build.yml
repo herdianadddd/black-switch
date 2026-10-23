@@ -3,19 +3,20 @@ on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: devkitpro/devkita64:latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup devkitA64
-        uses: devkitPro/setup-devkitA64@v1
       - name: Build
         run: |
           mkdir -p build
           cd build
           cmake .. -DCMAKE_TOOLCHAIN_FILE=/opt/devkitpro/cmake/Switch.cmake -DCMAKE_BUILD_TYPE=Release
           make -j4
-          /opt/devkitpro/tools/bin/elf2nro black-switch.elf black-switch.nro || /opt/devkitpro/tools/bin/elf2nro black-switch black-switch.nro
           ls -lh
-      - uses: actions/upload-artifact@v4
+      - name: Upload NRO
+        uses: actions/upload-artifact@v4
         with:
           name: black-switch-nro
           path: build/*.nro
+          if-no-files-found: warn
