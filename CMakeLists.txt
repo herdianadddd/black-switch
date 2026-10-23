@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.20)
+project(black-switch C CXX)
+set(CMAKE_CXX_STANDARD 17)
+add_executable(black-switch.elf src/main_switch.cpp src/renderer_switch.cpp)
+target_include_directories(black-switch.elf PRIVATE src/)
+target_link_libraries(black-switch.elf PRIVATE deko3d nx)
