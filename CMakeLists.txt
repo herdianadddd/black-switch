@@ -10,6 +10,7 @@ add_executable(black-switch
 
 target_link_libraries(black-switch
     nx
+    deko3d
 )
 
 add_custom_command(TARGET black-switch POST_BUILD
