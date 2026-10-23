@@ -28,11 +28,9 @@ bool Renderer_Init(int w, int h) {
     cmdMaker.offset = 0; cmdMaker.size = memMaker.size;
     s_cmdbuf = dkCmdBufCreate(&cmdMaker);
     if(!s_cmdbuf) return false;
-
     DkFenceMaker fenceMaker; dkFenceMakerDefaults(&fenceMaker, s_device);
     s_fence = dkFenceCreate(&fenceMaker);
     s_fenced = false;
-
     DkSwapchainMaker scMaker;
     dkSwapchainMakerDefaults(&scMaker, s_device, nwindowGetDefault(), w, h, 2);
     s_swapchain = dkSwapchainCreate(&scMaker);
@@ -55,7 +53,6 @@ void Renderer_EndFrame() {
     int slot = 0;
     dkSwapchainAcquireImage(s_swapchain, &slot, &s_fence);
     s_fenced = true;
-
     DkCmdList list = dkCmdBufFinishList(s_cmdbuf);
     dkQueueSubmitCommands(s_queue, list);
     dkQueuePresentImage(s_queue, s_swapchain, slot);
@@ -64,7 +61,6 @@ void Renderer_EndFrame() {
 void Renderer_Shutdown() {
     if(!s_inited) return;
     dkQueueWaitIdle(s_queue);
-    dkFenceDestroy(&s_fence);
     dkSwapchainDestroy(s_swapchain);
     dkCmdBufDestroy(s_cmdbuf);
     dkMemBlockDestroy(s_cmdMem);
