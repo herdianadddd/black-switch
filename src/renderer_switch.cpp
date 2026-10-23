@@ -60,7 +60,7 @@ void Renderer_EndFrame() {
     dkImageViewDefaults(&view, fb);
 
     dkCmdBufBindRenderTarget(s_cmdbuf, &view, nullptr);
-    dkCmdBufClearColor(s_cmdbuf, 0, DkColorFormat_RGBA8_Unorm, 0x000000FF);
+    dkCmdBufClearColor(s_cmdbuf, 0, DkImageFormat_RGBA8_Unorm, 0x000000FF);
 
     DkCmdList list = dkCmdBufFinishList(s_cmdbuf);
     dkQueueSubmitCommands(s_queue, list);
