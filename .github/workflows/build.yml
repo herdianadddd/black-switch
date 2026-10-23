@@ -1,0 +1,19 @@
+name: Build Black Switch
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: devkitpro/devkita64:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: |
+          mkdir build && cd build
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=/opt/devkitpro/cmake/Switch.cmake
+          make -j4
+          /opt/devkitpro/tools/bin/elf2nro black-switch.elf black-switch.nro
+      - uses: actions/upload-artifact@v4
+        with:
+          name: black-switch-nro
+          path: build/black-switch.nro
