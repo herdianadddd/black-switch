@@ -3,14 +3,15 @@ project(black-switch)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(black-switch.elf
+add_executable(black-switch
     src/main_switch.cpp
 )
 
-target_link_libraries(black-switch.elf
+target_link_libraries(black-switch
     nx
 )
 
-add_custom_command(TARGET black-switch.elf POST_BUILD
-    COMMAND elf2nro black-switch.elf black-switch.nro
+add_custom_command(TARGET black-switch POST_BUILD
+    COMMAND elf2nro black-switch black-switch.nro
+    VERBATIM
 )
