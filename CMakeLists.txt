@@ -12,6 +12,6 @@ target_link_libraries(black-switch
 )
 
 add_custom_command(TARGET black-switch POST_BUILD
-    COMMAND elf2nro black-switch black-switch.nro
-    VERBATIM
+    COMMAND elf2nro black-switch.elf black-switch.nro
+    COMMENT "Building NRO..."
 )
