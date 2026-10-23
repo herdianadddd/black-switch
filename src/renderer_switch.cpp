@@ -45,7 +45,6 @@ void Renderer_BeginFrame() {
         dkFenceWait(&s_fence, UINT64_MAX);
         s_fenced = false;
     }
-    dkCmdBufReset(s_cmdbuf);
 }
 
 void Renderer_EndFrame() {
