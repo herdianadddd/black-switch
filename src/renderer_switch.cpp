@@ -43,14 +43,9 @@ void Renderer_EndFrame() {
     if(!s_inited) return;
     int slot = dkSwapchainAcquireImage(s_swapchain);
     if(slot < 0) return;
-    DkImage const* fb = dkSwapchainGetImage(s_swapchain, slot);
-    DkImageView view; dkImageViewDefaults(&view, fb);
-    dkCmdBufBindRenderTarget(s_cmdbuf, &view, nullptr);
-    
-    // API BARU: mask + pointer
-    float black[4] = {0.0f, 0.0f, 0.0f, 1.0f};
-    dkCmdBufClearColor(s_cmdbuf, 0, 15, black);
 
+    // Tanpa dkSwapchainGetImage - langsung submit & present
+    // Di API baru, swapchain sudah handle sendiri
     DkCmdList list = dkCmdBufFinishList(s_cmdbuf);
     dkQueueSubmitCommands(s_queue, list);
     dkQueuePresentImage(s_queue, s_swapchain, slot);
