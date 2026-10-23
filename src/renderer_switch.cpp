@@ -6,6 +6,8 @@ static DkQueue s_queue = nullptr;
 static DkCmdBuf s_cmdbuf = nullptr;
 static DkMemBlock s_cmdMem = nullptr;
 static DkSwapchain s_swapchain = nullptr;
+static DkFence s_fence;
+static bool s_fenced = false;
 static bool s_inited = false;
 
 bool Renderer_Init(int w, int h) {
@@ -26,6 +28,11 @@ bool Renderer_Init(int w, int h) {
     cmdMaker.offset = 0; cmdMaker.size = memMaker.size;
     s_cmdbuf = dkCmdBufCreate(&cmdMaker);
     if(!s_cmdbuf) return false;
+
+    DkFenceMaker fenceMaker; dkFenceMakerDefaults(&fenceMaker, s_device);
+    s_fence = dkFenceCreate(&fenceMaker);
+    s_fenced = false;
+
     DkSwapchainMaker scMaker;
     dkSwapchainMakerDefaults(&scMaker, s_device, nwindowGetDefault(), w, h, 2);
     s_swapchain = dkSwapchainCreate(&scMaker);
@@ -36,16 +43,19 @@ bool Renderer_Init(int w, int h) {
 
 void Renderer_BeginFrame() {
     if(!s_inited) return;
+    if(s_fenced) {
+        dkFenceWait(&s_fence, UINT64_MAX);
+        s_fenced = false;
+    }
     dkCmdBufReset(s_cmdbuf);
 }
 
 void Renderer_EndFrame() {
     if(!s_inited) return;
-    int slot = dkSwapchainAcquireImage(s_swapchain);
-    if(slot < 0) return;
+    int slot = 0;
+    dkSwapchainAcquireImage(s_swapchain, &slot, &s_fence);
+    s_fenced = true;
 
-    // Tanpa dkSwapchainGetImage - langsung submit & present
-    // Di API baru, swapchain sudah handle sendiri
     DkCmdList list = dkCmdBufFinishList(s_cmdbuf);
     dkQueueSubmitCommands(s_queue, list);
     dkQueuePresentImage(s_queue, s_swapchain, slot);
@@ -54,6 +64,7 @@ void Renderer_EndFrame() {
 void Renderer_Shutdown() {
     if(!s_inited) return;
     dkQueueWaitIdle(s_queue);
+    dkFenceDestroy(&s_fence);
     dkSwapchainDestroy(s_swapchain);
     dkCmdBufDestroy(s_cmdbuf);
     dkMemBlockDestroy(s_cmdMem);
