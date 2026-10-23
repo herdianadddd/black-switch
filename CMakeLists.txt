@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(black-switch
     src/main_switch.cpp
+    src/renderer_switch.cpp
 )
 
 target_link_libraries(black-switch
