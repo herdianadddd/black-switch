@@ -1,6 +1,9 @@
 #include <switch.h>
+#include "renderer_switch.h"
+
 static Framebuffer s_fb;
 static bool s_inited = false;
+
 bool Renderer_Init(int w, int h){
     NWindow *win = nwindowGetDefault();
     if(!win) return false;
@@ -8,12 +11,24 @@ bool Renderer_Init(int w, int h){
     if(R_FAILED(rc)) return false;
     rc = framebufferMakeLinear(&s_fb);
     if(R_FAILED(rc)){framebufferClose(&s_fb);return false;}
-    s_inited=true;return true;
+    s_inited=true;
+    return true;
 }
+
 void Renderer_BeginFrame(){
     if(!s_inited) return;
-    u32 stride; u32 *buf = (u32*)framebufferBegin(&s_fb, &stride);
-    if(buf){for(int i=0;i<1280*720;i++) buf[i]=0xFF000000;}
+    u32 stride;
+    u32 *buf = (u32*)framebufferBegin(&s_fb, &stride);
+    if(buf){
+        // 0xAARRGGBB - sekarang MERAH biar keliatan hidup
+        for(int i=0;i<1280*720;i++) buf[i]=0xFFFF0000;
+    }
 }
-void Renderer_EndFrame(){if(s_inited) framebufferEnd(&s_fb);}
-void Renderer_Shutdown(){if(s_inited){framebufferClose(&s_fb);s_inited=false;}}
+
+void Renderer_EndFrame(){
+    if(s_inited) framebufferEnd(&s_fb);
+}
+
+void Renderer_Shutdown(){
+    if(s_inited){framebufferClose(&s_fb);s_inited=false;}
+}
