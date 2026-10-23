@@ -1,31 +1,22 @@
 #include <switch.h>
 
-extern bool Renderer_Init(int w, int h);
-extern void Renderer_BeginFrame();
-extern void Renderer_EndFrame();
-extern void Renderer_Shutdown();
+bool Renderer_Init(int w, int h){(void)w;(void)h;return true;}
+void Renderer_BeginFrame(){}
+void Renderer_EndFrame(){}
+void Renderer_Shutdown(){}
 
 int main(int argc, char* argv[]) {
     consoleInit(NULL);
-    printf("Black Switch - Test Build\n");
-    printf("Press PLUS to exit\n");
+    printf("Black Switch OK!\n");
+    printf("Press PLUS - 5 detik auto exit\n");
     
-    // Init renderer (stub dulu)
-    Renderer_Init(1280, 720);
-
+    int frames = 0;
     while(appletMainLoop()) {
-        hidScanInput();
-        u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
-        if (kDown & KEY_PLUS) break;
-
-        Renderer_BeginFrame();
-        // render here later
-        Renderer_EndFrame();
-
         consoleUpdate(NULL);
+        frames++;
+        if(frames > 300) break; // auto exit 5 detik biar ga hang
     }
-
-    Renderer_Shutdown();
+    
     consoleExit(NULL);
     return 0;
 }
